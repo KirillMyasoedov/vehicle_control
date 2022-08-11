@@ -5,3 +5,6 @@ install/
 train_products/
 dataset/
 venv/
+src/__pycache__
+src/models/__pycache__
+src/utills/__pycache__
