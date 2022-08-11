@@ -1,0 +1,5 @@
+<launch>
+    <arg name="train" value="true"/>
+    <node pkg="vehicle_control" type="vehicle_control_main.py" name="vehicle_control" output="screen"/>
+    <include file="$(find carla_ros_bridge)/launch/carla_ros_bridge_with_example_ego_vehicle.launch" unless="$(arg train)"/>
+</launch>

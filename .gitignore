@@ -1,0 +1,7 @@
+tests/
+.idea/
+build/
+install/
+train_products/
+dataset/
+venv/

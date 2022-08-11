@@ -1,0 +1,35 @@
+{
+  "training": true,
+  "testing": false,
+  "creating_dataset": false,
+  "dataset_dir": "/home/kirill/catkin_ws/src/vehicle_control/dataset",
+  "dataset_size" : 3000,
+  "cuda": true,
+
+  "train_settings": {
+    "type": "train",
+
+    "lr": 1e-4,
+    "batch_size": 1,
+    "num_workers": 8,
+    "n_epochs": 200,
+    "size": [600, 800],
+
+    "save": true,
+    "save_dir": "/home/kirill/catkin_ws/src/vehicle_control/train_products",
+    "resume_path": null
+  },
+
+  "val_settings": {
+    "type": "val",
+    "batch_size": 16,
+    "num_workers": 8
+  },
+  "model_settings": {
+    "name": "Unet",
+    "kwargs": {
+      "in_channels": 3,
+      "out_channels": 13
+    }
+  }
+}
