@@ -27,7 +27,8 @@ class ImagesSegmenter(object):
 
     def segment_image(self, rgb_image, testing_mask):
         with torch.no_grad():
-            image = torch.from_numpy(rgb_image.astype(np.float32) / 255 - 0.5).float()
+            image = torch.from_numpy(rgb_image.transpose(2, 0, 1).astype(np.float32) / 255 - 0.5).float()
+            image = image.unsqueeze(0)
 
             # make predictions
             output = self.model(image)

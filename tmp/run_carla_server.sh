@@ -1,1 +1,1 @@
-bash /home/kirill/CARLA_0.9.13/CarlaUE4.sh /Game/Maps/Town02 -carla-server -quality-level=Low #-benchmark -fps=0
+bash /home/kirill/CARLA_0.9.13/CarlaUE4.sh /Game/Maps/Town01 -carla-server -quality-level=Low #-benchmark -fps=0

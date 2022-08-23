@@ -12,6 +12,15 @@ class DatasetCreator(object):
         self.val_type = val_type
         self.images_counter = 0
 
+        # creating dataset directory
+        if not os.path.exists(self.directory):
+            os.makedirs(os.path.join(self.directory, "rgb", "train"))
+            os.makedirs(os.path.join(self.directory, "rgb", "val"))
+            os.makedirs(os.path.join(self.directory, "segmented", "train"))
+            os.makedirs(os.path.join(self.directory, "segmented", "val"))
+            os.makedirs(os.path.join(self.directory, "labels", "train"))
+            os.makedirs(os.path.join(self.directory, "labels", "val"))
+
     def save_images(self, rgb_image, labels_image):
         if self.images_counter <= self.size:
             self.images_counter += 1
@@ -22,11 +31,11 @@ class DatasetCreator(object):
             rgb_image.save(os.path.join(self.directory,
                                         "rgb/{}/{}.png".format(self.train_type, self.images_counter)))
             labels_image.save(os.path.join(self.directory,
-                                           "labels/{}/{}.png".format(self.train_type, self.images_counter)))
+                                           "segmented/{}/{}.png".format(self.train_type, self.images_counter)))
         elif self.images_counter == self.size + 1:
             self.images_counter += 1
             rgb_saved = os.listdir(os.path.join(self.directory, "rgb/train"))
-            labels_saved = os.listdir(os.path.join(self.directory, "labels/train"))
+            labels_saved = os.listdir(os.path.join(self.directory, "segmented/train"))
 
             images = list(zip(rgb_saved, labels_saved))
             random.shuffle(images)
@@ -39,8 +48,8 @@ class DatasetCreator(object):
                 shutil.copyfile(os.path.join(self.directory, "rgb/train", rgb),
                                 os.path.join(self.directory, "rgb/val", rgb))
                 os.remove(os.path.join(self.directory, "rgb/train", rgb))
-                shutil.copyfile(os.path.join(self.directory, "labels/train", labels),
-                                os.path.join(self.directory, "labels/val", labels))
-                os.remove(os.path.join(self.directory, "labels/train", labels))
+                shutil.copyfile(os.path.join(self.directory, "segmented/train", labels),
+                                os.path.join(self.directory, "segmented/val", labels))
+                os.remove(os.path.join(self.directory, "segmented/train", labels))
         else:
             print("Dataset size exceeded")

@@ -1,4 +1,5 @@
 import rospy
+import numpy as np
 
 
 class VehicleControlNode(object):
@@ -29,4 +30,5 @@ class VehicleControlNode(object):
             self.dataset_creator.save_images(rgb_image, testing_mask)
         else:
             resulting_mask = self.images_segmenter.segment_image(rgb_image, testing_mask)
+            print(np.unique(resulting_mask))
             self.output_data_adapter.publish_segmented_image(resulting_mask)

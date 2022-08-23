@@ -2,17 +2,23 @@ import torch
 import torch.nn.functional as F
 import torchvision.transforms.functional as fn
 from src.models import get_model
-from .cityscape_dataset import CityscapeDataset
+from src.cityscape_dataset import CityscapeDataset
 from tqdm import tqdm
 import numpy as np
 from sklearn.metrics import confusion_matrix
 from src.utills import stats_overall_accuracy, stats_iou_per_class
 from src.utills import Logger
+# from src.criterions.iou_loss import IoULoss
+# from src.criterions.lovasz_loss import LovaszSoftmax
+# from src.criterions.boundary_loss import SoftDiceLoss
+from src.criterions.ND_Crossentropy import CrossentropyND
+# from src.criterions.ND_Crossentropy import WeightedCrossEntropyLoss
+import json
 import os
 import shutil
 
 
-class VehicleControlNodeTrainer(object):
+class LanesSegmentationTrainer(object):
     def __init__(self, cuda, train_settings, val_settings, model_settings, dataset_dir):
         self.train_settins = train_settings
         self.val_settings = val_settings
@@ -24,6 +30,9 @@ class VehicleControlNodeTrainer(object):
         # set model
         self.model = get_model(model_settings["name"], model_settings["kwargs"]).to(device)
         # self.model = get_model(model_settings["name"], model_settings["kwargs"]).cuda()
+
+        # set criterion
+        self.criterion = CrossentropyND()
 
         # set optimizer
         self.optimizer = torch.optim.Adam(self.model.parameters(), lr=self.train_settins["lr"])
@@ -70,8 +79,11 @@ class VehicleControlNodeTrainer(object):
 
             outputs = self.model(inputs)
             self.optimizer.zero_grad()
-            loss = F.cross_entropy(outputs, targets)
+            # loss = F.cross_entropy(outputs, targets)
+            # loss.backward()
+            loss = self.criterion(outputs, targets)
             loss.backward()
+
             self.optimizer.step()
 
             outputs_np = np.argmax(outputs.cpu().detach().numpy(), axis=1)
@@ -112,7 +124,8 @@ class VehicleControlNodeTrainer(object):
 
                 outputs = self.model(inputs)
 
-                loss = F.cross_entropy(outputs, targets)
+                # loss = F.cross_entropy(outputs, targets)
+                loss = self.criterion(outputs, targets)
 
                 outputs_np = np.argmax(outputs.cpu().detach().numpy(), axis=1)
                 targets_np = targets.cpu().numpy()
@@ -180,3 +193,17 @@ class VehicleControlNodeTrainer(object):
                     "logger_data": self.logger.data
                 }
                 self.save_checkpoint(state, is_best)
+
+
+if __name__ == "__main__":
+    print("Loading configurations")
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    with open(os.path.join(current_dir, "config.json")) as config:
+        config = json.load(config)
+
+        lane_segmentation_trainer = LanesSegmentationTrainer(config["cuda"],
+                                                             config["train_settings"],
+                                                             config["val_settings"],
+                                                             config["model_settings"],
+                                                             config["dataset_dir"])
+        lane_segmentation_trainer.start_training()
